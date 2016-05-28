@@ -1,3 +1,5 @@
+'use strict';
+
 var nodeGuids = {},
     edgeGuids = {};
 
@@ -17,28 +19,25 @@ function connect(edge, node1, node2) {
         containerHtml = drawingContainer.innerHTML,
         edgeGuid = edge.getGuid();
 
-    drawingContainer.innerHTML = drawingContainer.innerHTML + '<line id="' + edgeGuid + '" x1="' + node1.getX() + '" y1="' + node1.getY() +
-        '" x2="' + node2.getX() + '" y2="' + node2.getY() + '" stroke-width="1" stroke="black"/>';
-
+    drawingContainer.innerHTML = drawingContainer.innerHTML + '<line id="' + edgeGuid + '" x1="' + node1.getX() + '" y1="' + node1.getY() + '" x2="' + node2.getX() + '" y2="' + node2.getY() + '" stroke-width="1" stroke="black"/>';
 }
 
 function init() {
 
-    document.getElementById('svg-network').innerHTML = '<svg id="svg-container" width="500" ' +
-        'height="500" xmlns="http://www.w3.org/2000/svg"></svg>';
-
+    document.getElementById('svg-network').innerHTML = '<svg id="svg-container" width="500" ' + 'height="500" xmlns="http://www.w3.org/2000/svg"></svg>';
 }
 
 function inflateNetwork(nodeArray, edgeArray) {
 
-    nodeArray.forEach(function(el, index) {
+    nodeArray.forEach(function (el, index) {
         createNodeSvg(el, el.getX(), el.getY());
         nodeGuids[el.getGuid()] = el;
     });
 
-    edgeArray.forEach(function(el, index) {
+    edgeArray.forEach(function (el, index) {
         connect(el, el.n1, el.n2);
         edgeGuids[el.getGuid()] = el;
     });
-
 }
+
+//# sourceMappingURL=main-compiled.js.map

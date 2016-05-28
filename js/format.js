@@ -1,10 +1,21 @@
 var DSSAHLJFSKA;
 
-class node {
+function guid() {
+    function s4() {
+        return Math.floor((1 + Math.random()) * 0x10000)
+            .toString(16)
+            .substring(1);
+    }
+    return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+        s4() + '-' + s4() + s4() + s4();
+}
+
+class Node {
     constructor(x, y, ref) {
         this.x = x;
         this.y = y;
         this.ref = ref;
+        this.guid = guid();
     }
     getX() {
         return this.x;
@@ -15,13 +26,16 @@ class node {
     getRef() {
         return this.ref;
     }
-
+    getGuid() {
+        return this.guid;
+    }
 }
 
 class Edge {
     constructor(n1, n2) {
         this.n1 = n1;
         this.n2 = n2;
+        this.guid = guid();
     }
     getN1() {
         return this.n1;
@@ -29,33 +43,37 @@ class Edge {
     getN2() {
         return this.n2;
     }
+    getGuid() {
+        return this.guid;
+    }
 }
 
 
-var edgeArray = [];
-var nodeArray = [];
+var EDGEARRAY = [];
+var NODEARRAY = [],
+    i;
 
-for (var i = 0; i < 6; i++) {
-    nodeArray.push(new node(Math.random() * 10, Math.random() * 10, Math.floor((Math.random() * 6))));
+for (i = 0; i < 6; i++) {
+    NODEARRAY.push(new Node(Math.random() * 500, Math.random() * 500, Math.floor((Math.random() * 6))));
 }
 
-nodeArray.forEach(function (element) {
+NODEARRAY.forEach(function (element) {
     console.log(element);
     console.log(element.getRef());
 });
 
-var node1 = nodeArray[0];
-var node2 = nodeArray[1];
+var node1 = NODEARRAY[0];
+var node2 = NODEARRAY[1];
 
 var e = new Edge(node1, node2);
 console.log(e);
 
 DSSAHLJFSKA = e;
 
-for (var i = 0; i < nodeArray.length; i++) {
-    edgeArray.push(new Edge(nodeArray[i], nodeArray[nodeArray[i].getRef()]));
+for (i = 0; i < NODEARRAY.length; i++) {
+    EDGEARRAY.push(new Edge(NODEARRAY[i], NODEARRAY[NODEARRAY[i].getRef()]));
 }
 
-edgeArray.forEach(function (element) {
+EDGEARRAY.forEach(function (element) {
     console.log(element);
 });
