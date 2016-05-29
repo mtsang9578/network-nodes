@@ -1,6 +1,8 @@
 var DSSAHLJFSKA;
 
 function guid() {
+    'use strict';
+
     function s4() {
         return Math.floor((1 + Math.random()) * 0x10000)
             .toString(16)
@@ -16,6 +18,7 @@ class Node {
         this.y = y;
         this.ref = ref;
         this.guid = guid();
+        this.connectedLines = [];
     }
     getX() {
         return this.x;
@@ -28,6 +31,9 @@ class Node {
     }
     getGuid() {
         return this.guid;
+    }
+    getLines() {
+        return this.connectedLines;
     }
 }
 

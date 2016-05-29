@@ -7,6 +7,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var DSSAHLJFSKA;
 
 function guid() {
+    'use strict';
+
     function s4() {
         return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
     }
@@ -21,6 +23,7 @@ var Node = function () {
         this.y = y;
         this.ref = ref;
         this.guid = guid();
+        this.connectedLines = [];
     }
 
     _createClass(Node, [{
@@ -42,6 +45,11 @@ var Node = function () {
         key: 'getGuid',
         value: function getGuid() {
             return this.guid;
+        }
+    }, {
+        key: 'getLines',
+        value: function getLines() {
+            return this.connectedLines;
         }
     }]);
 
