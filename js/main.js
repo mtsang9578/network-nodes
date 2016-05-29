@@ -105,8 +105,8 @@ function inflateNetwork(nodeArray, edgeArray) {
                     scheduled = true;
                     setTimeout(function () {
                         scheduled = false;
-                        activeNode.x = lastEvent.clientX;
-                        activeNode.y = lastEvent.clientY;
+                        activeNode.x = lastEvent.clientX - $('#svg-container').offset().left;
+                        activeNode.y = lastEvent.clientY - $('#svg-container').offset().top;
                         drawNode(activeNode);
                         activeNode.getLines().forEach(function (connection) {
                             drawEdge(edgeGuids[connection]);
@@ -125,8 +125,14 @@ function inflateNetwork(nodeArray, edgeArray) {
 function init() {
     'use strict';
 
-    document.getElementById('svg-network').innerHTML = '<svg id="svg-container" width="500" ' +
-        'height="500" xmlns="http://www.w3.org/2000/svg"></svg>';
+    var svgContainer = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+
+    svgContainer.setAttribute('id', 'svg-container');
+    svgContainer.setAttribute('width', '500');
+    svgContainer.setAttribute('height', '500');
+    svgContainer.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+
+    document.getElementById('svg-network').appendChild(svgContainer);
 
     inflateNetwork(NODEARRAY, EDGEARRAY);
 
