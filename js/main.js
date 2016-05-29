@@ -84,9 +84,8 @@ function inflateNetwork(nodeArray, edgeArray) {
     edgeArray.forEach(function (el) {
         drawEdge(el);
         edgeGuids[el.getGuid()] = el;
-        !el.getN1().getLines().includes(el.getGuid()) ? el.getN1().connectedLines.push(el.getGuid()) : undefined;
-        !el.getN2().getLines().includes(el.getGuid()) ? el.getN2().connectedLines.push(el.getGuid()) : undefined;
-        //el.getN2().connectedLines.push(el.getGuid());
+        el.getN1().connectedLines.push(el.getGuid());
+        el.getN2().connectedLines.push(el.getGuid());
     });
 
     // jank ass method to force content inside svg-container to draw correctly
@@ -99,14 +98,15 @@ function inflateNetwork(nodeArray, edgeArray) {
                 var lastEvent = event,
                     scheduled = false,
                     activeNodeGuid = activeNodeDom.getElementsByTagName('circle')[0].getAttribute('id'),
-                    activeNode = nodeGuids[activeNodeGuid];
+                    activeNode = nodeGuids[activeNodeGuid],
+                    svgContainer = $('#svg-container');
 
                 if (!scheduled) {
                     scheduled = true;
                     setTimeout(function () {
                         scheduled = false;
-                        activeNode.x = lastEvent.clientX - $('#svg-container').offset().left;
-                        activeNode.y = lastEvent.clientY - $('#svg-container').offset().top;
+                        activeNode.x = lastEvent.clientX - svgContainer.offset().left;
+                        activeNode.y = lastEvent.clientY - svgContainer.offset().top;
                         drawNode(activeNode);
                         activeNode.getLines().forEach(function (connection) {
                             drawEdge(edgeGuids[connection]);
@@ -114,9 +114,6 @@ function inflateNetwork(nodeArray, edgeArray) {
                     }, 15);
                 }
             });
-        }
-        if (e.type === 'mouseup') {
-            $(this).off('mousemove');
         }
     });
 
