@@ -1,5 +1,8 @@
 var nodeGuids = {},
-    edgeGuids = {};
+    edgeGuids = {},
+    ORIGMOUSEX,
+    ORIGMOUSEY,
+    movingNode = false;
 
 function drawNode(node) {
     'use strict';
@@ -13,10 +16,10 @@ function drawNode(node) {
         nodePoint = document.getElementById(node.getGuid());
         clickableCircle = document.getElementById(node.getGuid() + '-c');
 
-        nodePoint.setAttribute('cx', node.getX());
-        nodePoint.setAttribute('cy', node.getY());
-        clickableCircle.setAttribute('cx', node.getX());
-        clickableCircle.setAttribute('cy', node.getY());
+        [nodePoint, clickableCircle].forEach(function (el) {
+            el.setAttribute('cx', node.getX());
+            el.setAttribute('cy', node.getY());
+        });
     } else {
         nodePoint = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         clickable = document.createElementNS('http://www.w3.org/2000/svg', 'a');
@@ -34,6 +37,7 @@ function drawNode(node) {
         [nodePoint, clickableCircle].forEach(function (el) {
             el.setAttribute('cx', node.getX());
             el.setAttribute('cy', node.getY());
+            el.setAttribute('class', 'cursor-pointer');
             drawingContainer.appendChild(el);
         });
     }
@@ -91,50 +95,68 @@ function inflateNetwork(nodeArray, edgeArray) {
     // jank ass method to force content inside svg-container to draw correctly
     document.getElementById('svg-container').innerHTML = document.getElementById('svg-container').innerHTML + ' ';
 
-    $('a').on('mousedown mouseup', function (e) {
-        var activeNodeDom = this;
-        if (e.type === 'mousedown') {
+    $('a').on('mousedown', function (e) {
+        var activeDomNode = this;
+        movingNode = true;
+        $(document).on('mousemove', function (event) {
+            var lastEvent = event,
+                scheduled = false,
+                activeNodeGuid = activeDomNode.getElementsByTagName('circle')[0].getAttribute('id'),
+                activeNode = nodeGuids[activeNodeGuid],
+                svgContainer = $('#svg-container');
+
+            if (!scheduled) {
+                scheduled = true;
+                setTimeout(function () {
+                    scheduled = false;
+                    activeNode.x = lastEvent.clientX - svgContainer.offset().left;
+                    activeNode.y = lastEvent.clientY - svgContainer.offset().top;
+                    drawNode(activeNode);
+                    activeNode.getLines().forEach(function (connection) {
+                        drawEdge(edgeGuids[connection]);
+                    });
+                }, 15);
+            }
+        });
+    });
+
+
+    $('#svg-container').on('mousedown', function (event) {
+        if (!movingNode) {
+            var origMouseX = event.clientX,
+                origMouseY = event.clientY;
             $(document).on('mousemove', function (event) {
                 var lastEvent = event,
-                    scheduled = false,
-                    activeNodeGuid = activeNodeDom.getElementsByTagName('circle')[0].getAttribute('id'),
-                    activeNode = nodeGuids[activeNodeGuid],
-                    svgContainer = $('#svg-container');
+                    scheduled = false;
 
                 if (!scheduled) {
                     scheduled = true;
                     setTimeout(function () {
                         scheduled = false;
-                        activeNode.x = lastEvent.clientX - svgContainer.offset().left;
-                        activeNode.y = lastEvent.clientY - svgContainer.offset().top;
-                        drawNode(activeNode);
-                        activeNode.getLines().forEach(function (connection) {
-                            drawEdge(edgeGuids[connection]);
+                        NODEARRAY.forEach(function (el) {
+                            el.x = el.x + event.clientX - origMouseX;
+                            el.y = el.y + event.clientY - origMouseY;
+                            drawNode(el);
+                            el.getLines().forEach(function (connection) {
+                                drawEdge(edgeGuids[connection]);
+                            });
                         });
+                        origMouseX = event.clientX;
+                        origMouseY = event.clientY;
                     }, 15);
                 }
             });
         }
     });
-
 }
 
 function init() {
     'use strict';
 
-    var svgContainer = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-
-    svgContainer.setAttribute('id', 'svg-container');
-    svgContainer.setAttribute('width', '500');
-    svgContainer.setAttribute('height', '500');
-    svgContainer.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-
-    document.getElementById('svg-network').appendChild(svgContainer);
-
     inflateNetwork(NODEARRAY, EDGEARRAY);
 
     $(document).on('mouseup', function () {
         $(document).off('mousemove');
+        movingNode = false;
     });
-
 }
